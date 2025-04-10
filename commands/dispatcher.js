@@ -11,7 +11,7 @@ class CommandDispatcher {
             'sofia': () => new SofiaHandler(this.accessors.option, this.accessors.commandNew, this.accessors.decision),
             'InstanceWorkflow': () => new InstanceWorkflowHandler(),
             'searchWorkflow': () => new SearchWorkflowHandler(),
-            'document': () => new DocumentHandler()
+            'document': () => new DocumentHandler(this.accessors.option, this.accessors.commandNew, this.accessors.decision)
         };
     }
 

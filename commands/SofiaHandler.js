@@ -22,7 +22,6 @@ class SofiaHandler extends CommandHandler {
             return;
         }
 
-        console.log(estadoDecision)
         if (estadoDecision === 'conversando') {
             if (texto.toLowerCase() !== 'sair') {
                 const respostaIA = await this.sendForIA(texto);
