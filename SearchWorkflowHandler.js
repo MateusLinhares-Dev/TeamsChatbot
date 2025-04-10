@@ -2,7 +2,7 @@ const CommandHandler = require('./CommandHandler');
 const axios = require('axios');
 require('dotenv').config();
 
-class IdentificadorHandler extends CommandHandler {
+class SearchWorkflowHandler extends CommandHandler {
     async handle(context) {
         // console.log(context)
         const identificador = context.activity.text.trim();
@@ -37,9 +37,15 @@ class IdentificadorHandler extends CommandHandler {
                     `📝 Título: ${item.titulo}\n\n` +
                     `📌 Status: ${item.status}`
                 );
+
+                await context
+
             } else {
                 await context.sendActivity('Nenhuma informação encontrada para o identificador informado.');
             }
+
+
+
         } catch (error) {
             console.error('Erro ao consultar o workflow:', error.message);
             await context.sendActivity('Erro ao buscar o workflow. Verifique o identificador ou tente novamente mais tarde.');
