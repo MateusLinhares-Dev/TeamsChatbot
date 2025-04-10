@@ -2,6 +2,7 @@ const { ActivityHandler, MessageFactory } = require('botbuilder');
 const { sendIntroCard } = require('./utils/introCard');
 const CommandDispatcher = require('./commands/dispatcher');
 
+
 class EchoBot extends ActivityHandler {
     constructor(userState) {
         super();
@@ -12,12 +13,12 @@ class EchoBot extends ActivityHandler {
         this.opcaoEscolhida = userState.createProperty('opcaoEscolhida');
         this.comandoAtual = userState.createProperty('commandNew');
         this.continueSession = userState.createProperty('DecisionContinueSession')
+        console.log(typeof this.continueSession)
 
         this.onMessage(async (context, next) => {
             const text = context.activity.text.trim();
             const didBotWelcomedUser = await this.welcomedUserProperty.get(context, false);
             const comandoAtual = await this.comandoAtual.get(context, null);
-            const continueSession = await this.continueSession.get(context, false)
 
             this.dispatcher = new CommandDispatcher({
                 option: this.opcaoEscolhida,

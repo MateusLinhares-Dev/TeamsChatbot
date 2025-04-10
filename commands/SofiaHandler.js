@@ -1,6 +1,6 @@
 const CommandHandler = require('./CommandHandler');
 const fetch = require('node-fetch');
-const { sendQuestionCard } = require('../utils/introCard')
+const { GetOutFlow }  = require('../utils/ContinueDecisionHelper')
 
 class SofiaHandler extends CommandHandler {
     constructor(opcaoEscolhidaAccessor, comandoAtualAccessor, decisionUserCommand) {
@@ -22,17 +22,15 @@ class SofiaHandler extends CommandHandler {
             return;
         }
 
+        console.log(estadoDecision)
         if (estadoDecision === 'conversando') {
-            if (!await texto.toLowerCase().includes('sair')){
+            if (texto.toLowerCase() !== 'sair') {
                 const respostaIA = await this.sendForIA(texto);
                 await context.sendActivity(`🧠 Sofia respondeu:\n${respostaIA}`);
                 await context.sendActivity('Pode continuar a perguntar ou diga "sair" para terminar.');
             } else {
-                await this.opcaoEscolhidaAccessor.set(context, false);
-                await this.decisionUserCommand.set(context, null);
-                await context.sendActivity('Conversa com Sofia terminada. Até à próxima!');
+                await GetOutFlow(context, this.comandoAtualAccessor, this.decisionUserCommand, this.opcaoEscolhidaAccessor)
             }
-        
         }
     }
 

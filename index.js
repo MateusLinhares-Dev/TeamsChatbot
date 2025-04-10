@@ -1,14 +1,12 @@
 const path = require('path');
 
 const dotenv = require('dotenv');
-// Import required bot configuration.
+
 const ENV_FILE = path.join(__dirname, '.env');
 dotenv.config({ path: ENV_FILE });
 const { MemoryStorage, UserState } = require('botbuilder');
 const restify = require('restify');
 
-// Import required bot services.
-// See https://aka.ms/bot-services to learn more about the different parts of a bot.
 const {
     CloudAdapter,
     ConfigurationServiceClientCredentialFactory,

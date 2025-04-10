@@ -1,37 +1,39 @@
 const { CardFactory, ActionTypes } = require('botbuilder');
 
+const iconUrl = 'https://cdn-icons-png.flaticon.com/512/545/545705.png';
+
 async function sendIntroCard(context) {
     const card = CardFactory.heroCard(
-        'Escolha uma opção abaixo:',
-        ['https://aka.ms/bf-welcome-card-image'],
+        '🤖 Olá! Escolhe uma das opções abaixo:',
+        null,
         [
             {
                 type: ActionTypes.PostBack,
-                title: 'Falar com a Sofia',
+                title: '💬 Falar com a Sofia',
                 value: 'sofia',
-                image: 'https://via.placeholder.com/20/FF0000?text=R',
-                imageAltText: 'R'
+                image: iconUrl,
+                imageAltText: 'Chat com Sofia'
             },
             {
                 type: ActionTypes.PostBack,
-                title: 'Instanciar Workflow',
+                title: '⚙️ Instanciar Workflow',
                 value: 'InstanceWorkflow',
-                image: 'https://via.placeholder.com/20/FF0000?text=R',
-                imageAltText: 'R'
+                image: iconUrl,
+                imageAltText: 'Instanciar Workflow'
             },
             {
                 type: ActionTypes.PostBack,
-                title: 'Consultar workflow',
+                title: '🔍 Consultar workflow',
                 value: 'searchWorkflow',
-                image: 'https://via.placeholder.com/20/FF0000?text=R',
-                imageAltText: 'R'
+                image: iconUrl,
+                imageAltText: 'Consultar Workflow'
             },
             {
                 type: ActionTypes.PostBack,
-                title: 'Consulta de documentos',
+                title: '📄 Consulta de documentos',
                 value: 'document',
-                image: 'https://via.placeholder.com/20/FF0000?text=R',
-                imageAltText: 'R'
+                image: iconUrl,
+                imageAltText: 'Consulta de Documentos'
             },
         ]
     );
@@ -39,31 +41,6 @@ async function sendIntroCard(context) {
     await context.sendActivity({ attachments: [card] });
 }
 
-async function sendQuestionCard(context) {
-    const card = CardFactory.heroCard(
-        'Deseja voltar ao menu inicial ?',
-        ['https://aka.ms/bf-welcome-card-image'],
-        [
-            {
-                type: ActionTypes.PostBack,
-                title: 'Sim',
-                value: 'sim',
-                image: 'https://via.placeholder.com/20/FF0000?text=R',
-                imageAltText: 'R'
-            },
-            {
-                type: ActionTypes.PostBack,
-                title: 'Não',
-                value: 'nao',
-                image: 'https://via.placeholder.com/20/FF0000?text=R',
-                imageAltText: 'R'
-            }
-        ]
-    );
-
-    await context.sendActivity({ attachments: [card] });
-}
 module.exports = {
-    sendIntroCard,
-    sendQuestionCard
+    sendIntroCard
 };
