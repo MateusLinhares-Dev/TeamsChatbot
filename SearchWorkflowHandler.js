@@ -2,36 +2,21 @@ const CommandHandler = require('./CommandHandler');
 const axios = require('axios');
 require('dotenv').config();
 
-class SearchWorkflowHandler extends CommandHandler {
-    constructor(opcaoEscolhida, commandNew, decision) {
-        super();
-        this.opcaoEscolhida = opcaoEscolhida;
-        this.commandNew = commandNew;
-        this.decision = decision;
-    }
-
+class IdentificadorHandler extends CommandHandler {
     async handle(context) {
-        const idprocess = context.activity.text?.trim();
-
-        if (!/^\d+$/.test(idprocess)) {
-            await context.sendActivity('Digite o número do chamado que você deseja buscar:');
+        // console.log(context)
+        const identificador = context.activity.text.trim();
+        console.log(identificador)
+        if (identificador == "searchWorkflow"){
+            await context.sendActivity('Digite o identificador do workflow que você deseja consutar: ');
             return;
         }
-
-        await this.queryWorkflow(context, idprocess);
-
-        // Limpa o estado de comando para encerrar o fluxo
-        await this.commandNew.set(context, null);
-    }
-
-    async queryWorkflow(context, idprocess) {
+        
         const url = process.env.API_URL;
         const token = process.env.API_TOKEN;
-    
+
         try {
-            const response = await axios.post(url, {
-                idprocess: idprocess 
-            }, {
+            const response = await axios.post(url, { idprocess: identificador }, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': token
@@ -43,23 +28,23 @@ class SearchWorkflowHandler extends CommandHandler {
             if (Array.isArray(data) && data.length > 0) {
                 const item = data[0];
                 await context.sendActivity(
-                    `🔍 Resultado da consulta:\n` +
-                    `📅 Data de Início: ${item.datainicio}\n` +
-                    `🧾 Processo: ${item.nomeprocesso}\n` +
-                    `🎫 Ticket: ${item.ticket}\n` +
-                    `📂 Tipo: ${item.tipoprocesso}\n` +
-                    `👤 Iniciador: ${item.iniciador}\n` +
-                    `📝 Título: ${item.titulo}\n` +
+                    `🔍 Resultado da consulta:\n\n` +
+                    `📅 Data de Início: ${item.datainicio}\n\n` +
+                    `🧾 Processo: ${item.nomeprocesso}\n\n` +
+                    `🎫 Ticket: ${item.ticket}\n\n` +
+                    `📂 Tipo: ${item.tipoprocesso}\n\n` +
+                    `👤 Iniciador: ${item.iniciador}\n\n` +
+                    `📝 Título: ${item.titulo}\n\n` +
                     `📌 Status: ${item.status}`
                 );
             } else {
-                await context.sendActivity('Nenhuma informação encontrada para o chamado informado.');
+                await context.sendActivity('Nenhuma informação encontrada para o identificador informado.');
             }
         } catch (error) {
-            console.error('Erro ao consultar o dataset:', error.message);
-            await context.sendActivity('Erro ao buscar o workflow. Verifique o número informado ou tente novamente mais tarde.');
+            console.error('Erro ao consultar o workflow:', error.message);
+            await context.sendActivity('Erro ao buscar o workflow. Verifique o identificador ou tente novamente mais tarde.');
         }
     }
 }
 
-module.exports = SearchWorkflowHandler;
+module.exports = IdentificadorHandler;
