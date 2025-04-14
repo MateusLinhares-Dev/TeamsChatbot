@@ -29,6 +29,7 @@ class SofiaHandler extends CommandHandler {
                 await context.sendActivity('Pode continuar a perguntar ou diga "sair" para terminar.');
             } else {
                 await GetOutFlow(context, this.comandoAtualAccessor, this.decisionUserCommand, this.opcaoEscolhidaAccessor)
+                return;
             }
         }
     }

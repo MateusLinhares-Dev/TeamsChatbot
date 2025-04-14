@@ -13,7 +13,7 @@ class EchoBot extends ActivityHandler {
         this.opcaoEscolhida = userState.createProperty('opcaoEscolhida');
         this.comandoAtual = userState.createProperty('commandNew');
         this.continueSession = userState.createProperty('DecisionContinueSession')
-        console.log(typeof this.continueSession)
+        this.documentIdSession = userState.createProperty('documentIdSession')
 
         this.onMessage(async (context, next) => {
             const text = context.activity.text.trim();
@@ -23,7 +23,8 @@ class EchoBot extends ActivityHandler {
             this.dispatcher = new CommandDispatcher({
                 option: this.opcaoEscolhida,
                 commandNew: this.comandoAtual,
-                decision: this.continueSession
+                decision: this.continueSession,
+                documentId: this.documentIdSession
             });
 
             if (!didBotWelcomedUser) {
@@ -32,6 +33,7 @@ class EchoBot extends ActivityHandler {
                 await sendIntroCard(context);
             } else if (!comandoAtual) {
                 const command = text;
+                console.log(command)
                 const handled = await this.dispatcher.dispatch(context, command);
                 if (handled) {
                     await this.comandoAtual.set(context, command);
