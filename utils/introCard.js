@@ -5,36 +5,36 @@ const iconUrl = 'https://cdn-icons-png.flaticon.com/512/545/545705.png';
 
 async function sendIntroCard(context) {
     const card = CardFactory.heroCard(
-        '🤖 Olá! Escolhe uma das opções abaixo:',
+        '🤖 Olá! Escolha uma das opções abaixo:',
         null,
         [
             {
-                type: ActionTypes.PostBack,
+                type: ActionTypes.MessageBack,
                 title: '💬 Falar com a Sofia',
-                value: 'sofia',
-                image: iconUrl,
-                imageAltText: 'Chat com Sofia'
+                value: { command: 'sofia' },
+                text: 'sofia',
+                image: iconUrl
             },
             {
-                type: ActionTypes.PostBack,
+                type: ActionTypes.MessageBack,
                 title: '⚙️ Instanciar Workflow',
-                value: 'InstanceWorkflow',
-                image: iconUrl,
-                imageAltText: 'Instanciar Workflow'
+                value: { command: 'InstanceWorkflow' },
+                text: 'InstanceWorkflow',
+                image: iconUrl
             },
             {
-                type: ActionTypes.PostBack,
+                type: ActionTypes.MessageBack,
                 title: '🔍 Consultar workflow',
-                value: 'searchWorkflow',
-                image: iconUrl,
-                imageAltText: 'Consultar Workflow'
+                value: { command: 'searchWorkflow' },
+                text: 'searchWorkflow',
+                image: iconUrl
             },
             {
-                type: ActionTypes.PostBack,
+                type: ActionTypes.MessageBack,
                 title: '📄 Consulta de documentos',
-                value: 'document',
-                image: iconUrl,
-                imageAltText: 'Consulta de Documentos'
+                value: { command: 'document' },
+                text: 'document',
+                image: iconUrl
             },
         ]
     );
@@ -110,7 +110,55 @@ async function generateCardDoc(context, ResponseApi) {
     await context.sendActivity({ attachments: [card] });
 }
 
+async function OptionsFilesDocumentCard(context, docData) {
+    let choices = [];
+
+    for (const doc of docData) {
+        if (doc.tipo === 'erro') {
+            await context.sendActivity(`❌ Erro ao buscar o documento: ${doc.mensagem}`);
+            await context.sendActivity('Escolha um documento que realmente exista')
+            return false
+        } else if (doc.tipo === 'binfile') {
+            choices.push({
+                title: doc.nome,
+                value: doc.nome
+            });
+        }
+    }
+
+    const card = {
+        type: "AdaptiveCard",
+        body: [
+            {
+                type: "TextBlock",
+                text: "🤖 Este documento tem estes arquivos disponíveis:",
+                weight: "bolder",
+                size: "medium"
+            },
+            {
+                type: "Input.ChoiceSet",
+                id: "selectedFiles",
+                style: "expanded",
+                isMultiSelect: true,
+                choices: choices
+            }
+        ],
+        actions: [
+            {
+                type: "Action.Submit",
+                title: "Selecionar"
+            }
+        ],
+        $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+        version: "1.3"
+    };
+
+    await context.sendActivity({ attachments: [CardFactory.adaptiveCard(card)] });
+    return true
+}
+
 module.exports = {
     sendIntroCard,
-    generateCardDoc
+    generateCardDoc,
+    OptionsFilesDocumentCard
 };

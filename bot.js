@@ -1,22 +1,26 @@
-const { ActivityHandler, MessageFactory } = require('botbuilder');
+const { ActivityHandler, MessageFactory, TurnContext } = require('botbuilder');
 const { sendIntroCard } = require('./utils/introCard');
 const CommandDispatcher = require('./commands/dispatcher');
 
-
 class EchoBot extends ActivityHandler {
-    constructor(userState) {
+    constructor(userState, conversationState) {
         super();
         this.userState = userState;
-        
-        // seta as propriedades a serem armazenadas
+        this.conversationState = conversationState;
+
         this.welcomedUserProperty = userState.createProperty('welcomedUser');
         this.opcaoEscolhida = userState.createProperty('opcaoEscolhida');
         this.comandoAtual = userState.createProperty('commandNew');
-        this.continueSession = userState.createProperty('DecisionContinueSession')
-        this.documentIdSession = userState.createProperty('documentIdSession')
+        this.continueSession = userState.createProperty('DecisionContinueSession');
+        this.documentIdSession = userState.createProperty('documentIdSession');
+        this.lastInteraction = conversationState.createProperty('lastInteraction'); // ← Timestamp da última interação
 
+        // Message Handler
         this.onMessage(async (context, next) => {
-            const text = context.activity.text.trim();
+            const text = context.activity.text ? context.activity.text.trim() : '';
+            const value = context.activity.value;
+            const command = value?.command || text;
+
             const didBotWelcomedUser = await this.welcomedUserProperty.get(context, false);
             const comandoAtual = await this.comandoAtual.get(context, null);
 
@@ -32,8 +36,6 @@ class EchoBot extends ActivityHandler {
                 await this.welcomedUserProperty.set(context, true);
                 await sendIntroCard(context);
             } else if (!comandoAtual) {
-                const command = text;
-                console.log(command)
                 const handled = await this.dispatcher.dispatch(context, command);
                 if (handled) {
                     await this.comandoAtual.set(context, command);
@@ -45,21 +47,24 @@ class EchoBot extends ActivityHandler {
             await next();
         });
 
-        this.onMembersAdded(async (context, next) => {
+        this.onConversationUpdate(async (context, next) => {
             const membersAdded = context.activity.membersAdded;
-            const welcomeText = 'Olá! Seja bem-vindo! 😄';
-
-            for (let cnt in membersAdded) {
-                if (membersAdded[cnt].id !== context.activity.recipient.id) {
-                    await context.sendActivity(MessageFactory.text(welcomeText));
-                    await sendIntroCard(context);
-                    await this.welcomedUserProperty.set(context, true);
+            if (membersAdded) {
+                for (let member of membersAdded) {
+                    if (member.id !== context.activity.recipient.id) {
+                        const didBotWelcomedUser = await this.welcomedUserProperty.get(context, false);
+                        if (!didBotWelcomedUser) {
+                            await context.sendActivity('Olá! Seja bem-vindo! 😄');
+                            await this.welcomedUserProperty.set(context, true);
+                            await sendIntroCard(context);
+                        }
+                    }
                 }
             }
-
             await next();
         });
     }
+
 
     async run(context) {
         await super.run(context);
